@@ -1,0 +1,43 @@
+@model List<CineBenavides.Models.Funcion>
+@{ ViewData["Title"] = "Nueva Reserva"; }
+
+<h2>Nueva Reserva — Elige una función 🎬</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted text-center py-4">No hay funciones disponibles en este momento.</p>
+}
+
+<div class="row">
+    @foreach (var f in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                @if (f.Pelicula?.PosterUrl != null)
+                {
+                    <img src="@f.Pelicula.PosterUrl" class="card-img-top"
+                         style="height:200px;object-fit:cover" />
+                }
+                else
+                {
+                    <div class="bg-dark d-flex align-items-center justify-content-center"
+                         style="height:200px">
+                        <span class="text-white fs-1">🎬</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@f.Pelicula?.Titulo</h5>
+                    <p class="mb-1">🏛 @f.Sala?.Nombre</p>
+                    <p class="mb-1">📅 @f.FechaHora.ToString("dd/MM/yyyy")</p>
+                    <p class="mb-1">🕐 @f.FechaHora.ToString("hh:mm tt")</p>
+                    <p class="fw-bold text-danger">$@f.Precio.ToString("N0")</p>
+
+                    @* Usamos asp-route-funcionId para que pase el parámetro correctamente *@
+                    <a asp-controller="Reserva" asp-action="Confirmar"
+                       asp-route-funcionId="@f.Id"
+                       class="btn btn-danger w-100">Seleccionar</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

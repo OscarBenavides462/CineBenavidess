@@ -1,0 +1,55 @@
+@model List<CineBenavides.Models.Reserva>
+@{ ViewData["Title"] = "Todas las Reservas"; }
+
+<h2>Todas las Reservas</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Cliente</th>
+            <th>Película</th>
+            <th>Sala</th>
+            <th>Fecha función</th>
+            <th>Asiento</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Usuario?.Nombre</td>
+                <td>@item.Funcion?.Pelicula?.Titulo</td>
+                <td>@item.Funcion?.Sala?.Nombre</td>
+                <td>@item.Funcion?.FechaHora.ToString("dd/MM/yyyy hh:mm tt")</td>
+                <td>Fila @item.Asiento?.Fila - @item.Asiento?.Numero</td>
+                <td>$@item.Total.ToString("N0")</td>
+                <td>
+                    @if (item.Estado == "Confirmada")
+                    {
+                        <span class="badge bg-success">@item.Estado</span>
+                    }
+                    else if (item.Estado == "Cancelada")
+                    {
+                        <span class="badge bg-danger">@item.Estado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">@item.Estado</span>
+                    }
+                </td>
+                <td>
+                    @if (item.Estado != "Cancelada")
+                    {
+                        <form action="/Reserva/Cancelar/@item.Id" method="post" style="display:inline"
+                              onsubmit="return confirm('¿Seguro que desea cancelar esta reserva?')">
+                            <button type="submit" class="btn btn-danger btn-sm">Cancelar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

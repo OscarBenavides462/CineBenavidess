@@ -1,0 +1,68 @@
+@{ ViewData["Title"] = "Confirmar Reserva"; }
+
+@{
+    var funcion = ViewBag.Funcion as CineBenavides.Models.Funcion;
+    var confiteria = ViewBag.Confiteria as List<CineBenavides.Models.Confiteria>;
+}
+
+<h2>Confirmar Reserva 🎟️</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@* Resumen de la función elegida *@
+<div class="card mb-4 border-danger">
+    <div class="card-body">
+        <h5 class="text-danger">🎬 @funcion?.Pelicula?.Titulo</h5>
+        <p class="mb-1">🏛 @funcion?.Sala?.Nombre &nbsp;|&nbsp; 📅 @funcion?.FechaHora.ToString("dd/MM/yyyy") &nbsp;|&nbsp; 🕐 @funcion?.FechaHora.ToString("hh:mm tt")</p>
+        <p class="fw-bold">Precio entrada: $@funcion?.Precio.ToString("N0")</p>
+    </div>
+</div>
+
+<form action="/Reserva/Confirmar" method="post">
+    <input type="hidden" name="funcionId" value="@funcion?.Id" />
+
+    @* Selección de asiento *@
+    <div class="mb-4">
+        <h5>💺 Elige tu asiento</h5>
+        <select name="asientoId" class="form-control" required>
+            <option value="">-- Seleccione un asiento disponible --</option>
+            @foreach (var a in (ViewBag.AsientosDisponibles as Microsoft.AspNetCore.Mvc.Rendering.SelectList)!)
+            {
+                <option value="@a.Value">@a.Text</option>
+            }
+        </select>
+    </div>
+
+    @* Selección de confitería *@
+    @if (confiteria != null && confiteria.Any())
+    {
+        <h5>🍿 Agrega confitería <small class="text-muted fs-6">(opcional)</small></h5>
+        <div class="row mb-4">
+            @for (int i = 0; i < confiteria.Count; i++)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <input type="hidden" name="confiteriaIds" value="@confiteria[i].Id" />
+                            <h6>@confiteria[i].Nombre</h6>
+                            <p class="text-danger fw-bold mb-1">$@confiteria[i].Precio.ToString("N0")</p>
+                            <p class="text-muted mb-2" style="font-size:.85rem">Stock: @confiteria[i].Stock</p>
+                            <div class="d-flex align-items-center gap-2">
+                                <label style="font-size:.9rem">Cantidad:</label>
+                                <input type="number" name="cantidades" value="0"
+                                       min="0" max="@confiteria[i].Stock"
+                                       class="form-control form-control-sm" style="width:70px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <button type="submit" class="btn btn-danger btn-lg">Confirmar Reserva</button>
+    <a href="/Reserva/Crear" class="btn btn-secondary btn-lg">Volver</a>
+</form>

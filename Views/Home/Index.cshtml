@@ -1,0 +1,44 @@
+@model List<CineBenavides.Models.Funcion>
+@{ ViewData["Title"] = "Inicio"; }
+
+<div class="text-center mb-5">
+    <h1 class="display-5 fw-bold">Bienvenido, @Context.Session.GetString("Usuario")     </h1>
+    <p class="text-muted">Estas son las próximas funciones disponibles</p>
+</div>
+
+<div class="row">
+    @foreach (var f in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                @if (f.Pelicula?.PosterUrl != null)
+                {
+                    <img src="@f.Pelicula.PosterUrl" class="card-img-top" style="height:220px;object-fit:cover" />
+                }
+                else
+                {
+                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height:220px">
+                        <span class="text-white fs-1">🎬</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@f.Pelicula?.Titulo</h5>
+                    <p class="card-text text-muted" style="font-size:.9rem">
+                        📅 @f.FechaHora.ToString("dd/MM/yyyy")<br/>
+                        🕐 @f.FechaHora.ToString("hh:mm tt")<br/>
+                        🏛 @f.Sala?.Nombre<br/>
+                        💰 $@f.Precio.ToString("N0")
+                    </p>
+                    <a href="/Reserva/Crear/@f.Id" class="btn btn-danger w-100">Reservar</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted py-5">
+        <p class="fs-4">No hay funciones programadas por el momento.</p>
+    </div>
+}

@@ -1,0 +1,54 @@
+@model CineBenavides.Models.Usuario
+@{ ViewData["Title"] = "Editar Usuario"; }
+
+<h2>Editar Usuario</h2>
+
+<form asp-action="Edit" method="post">
+
+    @* Sin este campo el Id llega en 0 y EF no sabe qué registro actualizar *@
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Correo</label>
+        <input asp-for="Correo" class="form-control" />
+        <span asp-validation-for="Correo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Rol</label>
+        <select asp-for="Rol" class="form-control">
+            <option value="Cliente">Cliente</option>
+            <option value="Soporte">Soporte</option>
+            <option value="Administrador">Administrador</option>
+        </select>
+        <span asp-validation-for="Rol" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Celular</label>
+        <input asp-for="Celular" class="form-control" />
+        <span asp-validation-for="Celular" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Nueva Clave</label>
+        <input asp-for="Clave" type="password" class="form-control" />
+        <span asp-validation-for="Clave" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/Usuario/Index" class="btn btn-secondary">Volver</a>
+
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

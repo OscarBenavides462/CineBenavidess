@@ -1,0 +1,31 @@
+@model CineBenavides.Models.Sala
+@{ ViewData["Title"] = "Editar Sala"; }
+
+<h2>Editar Sala</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Capacidad (número de asientos)</label>
+        <input asp-for="Capacidad" class="form-control" type="number" />
+        <span asp-validation-for="Capacidad" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/Sala/Index" class="btn btn-secondary">Volver</a>
+
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

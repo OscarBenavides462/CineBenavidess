@@ -1,0 +1,61 @@
+@model CineBenavides.Models.Confiteria
+@{ ViewData["Title"] = "Editar Producto"; }
+
+<h2>Editar Producto</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Precio</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input asp-for="Precio" class="form-control" type="number" step="500" />
+            </div>
+            <span asp-validation-for="Precio" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Stock</label>
+            <input asp-for="Stock" class="form-control" type="number" />
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Imagen actual</label><br />
+        @if (Model.ImagenUrl != null)
+        {
+            <img src="@Model.ImagenUrl" style="height:100px;border-radius:8px;" class="mb-2" />
+        }
+        else
+        {
+            <p class="text-muted" style="font-size:.9rem">Sin imagen</p>
+        }
+        <label>Cambiar imagen <small class="text-muted">(opcional)</small></label>
+        <input type="file" name="imagen" class="form-control" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/Confiteria/Index" class="btn btn-secondary">Volver</a>
+
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

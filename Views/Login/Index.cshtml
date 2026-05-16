@@ -1,0 +1,43 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CineBenavides — Iniciar sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body { background: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: #fff; border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .login-card h2 { color: #e63946; font-weight: 700; }
+        .login-card .subtitle { color: #6c757d; font-size: .9rem; margin-bottom: 1.5rem; }
+        .btn-cine { background: #e63946; color: #fff; border: none; }
+        .btn-cine:hover { background: #c1121f; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 class="text-center"> CineBenavides</h2>
+        <p class="text-center subtitle">Inicia sesión para continuar</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input type="email" name="correo" class="form-control" required autofocus />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Clave</label>
+                <input type="password" name="clave" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-cine w-100">Ingresar</button>
+        </form>
+    </div>
+</body>
+</html>

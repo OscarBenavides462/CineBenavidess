@@ -1,0 +1,50 @@
+@model CineBenavides.Models.Confiteria
+@{ ViewData["Title"] = "Nuevo Producto"; }
+
+<h2>Nuevo Producto</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" placeholder="Ej: Crispetas grandes..." />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Precio</label>
+            <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input asp-for="Precio" class="form-control" type="number" step="500" />
+            </div>
+            <span asp-validation-for="Precio" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Stock</label>
+            <input asp-for="Stock" class="form-control" type="number" />
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Imagen</label>
+        <input type="file" name="imagen" class="form-control" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="/Confiteria/Index" class="btn btn-secondary">Volver</a>
+
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

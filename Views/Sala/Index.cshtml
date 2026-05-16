@@ -1,0 +1,32 @@
+@model List<CineBenavides.Models.Sala>
+@{ ViewData["Title"] = "Salas"; }
+
+<h2>Salas</h2>
+
+<a class="btn btn-success mb-3" href="/Sala/Create">+ Nueva Sala</a>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Capacidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Capacidad asientos</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="/Sala/Edit/@item.Id">Editar</a>
+                    <form action="/Sala/Delete/@item.Id" method="post" style="display:inline"
+                          onsubmit="return confirm('¿Seguro que desea eliminar esta sala?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

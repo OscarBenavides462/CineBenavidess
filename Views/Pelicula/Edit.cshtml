@@ -1,0 +1,80 @@
+@model CineBenavides.Models.Pelicula
+@{ ViewData["Title"] = "Editar Película"; }
+
+<h2>Editar Película</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label>Título</label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Director</label>
+        <input asp-for="Director" class="form-control" />
+        <span asp-validation-for="Director" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Duración (minutos)</label>
+            <input asp-for="DuracionMinutos" class="form-control" type="number" />
+            <span asp-validation-for="DuracionMinutos" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Clasificación</label>
+            <select asp-for="Clasificacion" class="form-control">
+                <option value="">-- Seleccione --</option>
+                <option value="G">G — Para todo público</option>
+                <option value="PG">PG — Guía parental sugerida</option>
+                <option value="PG-13">PG-13 — Mayores de 13</option>
+                <option value="R">R — Restringido</option>
+                <option value="18+">18+ — Solo adultos</option>
+            </select>
+            <span asp-validation-for="Clasificacion" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Categoría</label>
+        <select asp-for="CategoriaId" class="form-control" asp-items="ViewBag.Categorias">
+            <option value="">-- Seleccione una categoría --</option>
+        </select>
+        <span asp-validation-for="CategoriaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Poster actual</label><br />
+        @if (Model.PosterUrl != null)
+        {
+            <img src="@Model.PosterUrl" style="height:120px;border-radius:8px;" class="mb-2" />
+        }
+        else
+        {
+            <p class="text-muted" style="font-size:.9rem">Sin imagen</p>
+        }
+        <label>Cambiar poster <small class="text-muted">(opcional)</small></label>
+        <input type="file" name="imagen" class="form-control" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="/Pelicula/Index" class="btn btn-secondary">Volver</a>
+
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

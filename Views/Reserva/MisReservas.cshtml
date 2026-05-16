@@ -1,0 +1,67 @@
+@model List<CineBenavides.Models.Reserva>
+@{ ViewData["Title"] = "Mis Reservas"; }
+
+<h2>Mis Reservas 🎟️</h2>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+
+<a class="btn btn-danger mb-3" href="/Reserva/Crear">+ Nueva Reserva</a>
+
+@if (!Model.Any())
+{
+    <p class="text-muted text-center py-4">No tienes reservas aún. ¡Haz tu primera reserva!</p>
+}
+
+@foreach (var item in Model)
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="card-title">🎬 @item.Funcion?.Pelicula?.Titulo</h5>
+                    <p class="mb-1">🏛 @item.Funcion?.Sala?.Nombre</p>
+                    <p class="mb-1">📅 @item.Funcion?.FechaHora.ToString("dd/MM/yyyy") &nbsp; 🕐 @item.Funcion?.FechaHora.ToString("hh:mm tt")</p>
+                    <p class="mb-1">💺 Fila @item.Asiento?.Fila - Asiento @item.Asiento?.Numero (@item.Asiento?.Tipo)</p>
+
+                    @if (item.Items.Any())
+                    {
+                        <p class="mb-1 mt-2"><strong>🍿 Confitería:</strong></p>
+                        <ul class="mb-0" style="font-size:.9rem">
+                            @foreach (var i in item.Items)
+                            {
+                                <li>@i.Confiteria?.Nombre x@i.Cantidad — $@i.Subtotal.ToString("N0")</li>
+                            }
+                        </ul>
+                    }
+                </div>
+                <div class="col-md-4 text-end">
+                    <p class="fs-5 fw-bold text-danger">Total: $@item.Total.ToString("N0")</p>
+                    @if (item.Estado == "Confirmada")
+                    {
+                        <span class="badge bg-success fs-6">@item.Estado</span>
+                    }
+                    else if (item.Estado == "Cancelada")
+                    {
+                        <span class="badge bg-danger fs-6">@item.Estado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark fs-6">@item.Estado</span>
+                    }
+
+                    @if (item.Estado != "Cancelada")
+                    {
+                        <br /><br />
+                        <form action="/Reserva/Cancelar/@item.Id" method="post"
+                              onsubmit="return confirm('¿Seguro que desea cancelar esta reserva?')">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Cancelar reserva</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
