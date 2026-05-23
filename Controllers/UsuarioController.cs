@@ -27,8 +27,7 @@ namespace CineBenavides.Controllers
         // GET: muestra el formulario de creación
         public IActionResult Create()
         {
-            if (HttpContext.Session.GetString("Usuario") == null)
-                return RedirectToAction("Index", "Login");
+            
 
             return View();
         }
@@ -37,8 +36,7 @@ namespace CineBenavides.Controllers
         [HttpPost]
         public IActionResult Create(Usuario usuario)
         {
-            if (HttpContext.Session.GetString("Usuario") == null)
-                return RedirectToAction("Index", "Login");
+            
 
             if (ModelState.IsValid)
             {

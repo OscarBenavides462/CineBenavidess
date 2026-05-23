@@ -18,18 +18,27 @@
         <input asp-for="Correo" class="form-control" />
         <span asp-validation-for="Correo" class="text-danger"></span>
     </div>
+    @if (Context.Session.GetString("Rol") == "Administrador")
+        {
+            <div class="mb-3">
+                <label>Rol</label>
+                <select asp-for="Rol" class="form-control">
+                    <option value="">-- Seleccione --</option>
+                    <option value="Cliente">Cliente</option>
+                    <option value="Soporte">Soporte</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
+            </div>
+        }
+        else
+{
+    {
+    <!-- Solo dejamos el input oculto. Al enviar el formulario, el servidor recibirá "Cliente" automáticamente -->
+    <input type="hidden" name="Rol" value="Cliente" />
+}
+}
 
-    <div class="mb-3">
-        <label>Rol</label>
-        <select asp-for="Rol" class="form-control">
-            <option value="">-- Seleccione --</option>
-            <option value=""> GOku</option>
-            <option value="Cliente">Cliente</option>
-            <option value="Soporte">Soporte</option>
-            <option value="Administrador">Administrador</option>
-        </select>
-        <span asp-validation-for="Rol" class="text-danger"></span>
-    </div>
 
     <div class="mb-3">
         <label>Celular</label>
