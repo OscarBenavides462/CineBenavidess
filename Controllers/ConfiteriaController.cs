@@ -8,10 +8,12 @@ namespace CineBenavides.Controllers
     public class ConfiteriaController : Controller
     {
         private readonly CineContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public ConfiteriaController(CineContext context)
+        public ConfiteriaController(CineContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         public IActionResult Index()
@@ -19,7 +21,7 @@ namespace CineBenavides.Controllers
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            var productos = _context.confiteria.ToList();
+            var productos = _context.confiteria.OrderBy(p => p.Nombre).ToList();
             return View(productos);
         }
 
@@ -32,26 +34,29 @@ namespace CineBenavides.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Confiteria producto, IFormFile imagen)
+        public IActionResult Create(Confiteria producto, IFormFile? imagen)
         {
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            if (imagen != null)
+            ModelState.Remove("ImagenFile");
+
+            if (!ModelState.IsValid)
+                return View(producto);
+
+            if (imagen != null && imagen.Length > 0)
             {
-                var ruta = Path.Combine(Directory.GetCurrentDirectory(),
-                    "wwwroot/images", imagen.FileName);
-
-                using (var stream = new FileStream(ruta, FileMode.Create))
-                {
-                    imagen.CopyTo(stream);
-                }
-
-                producto.ImagenUrl = "/images/" + imagen.FileName;
+                var carpeta = Path.Combine(_env.WebRootPath, "images");
+                Directory.CreateDirectory(carpeta);
+                var nombre = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+                using var stream = new FileStream(Path.Combine(carpeta, nombre), FileMode.Create);
+                imagen.CopyTo(stream);
+                producto.ImagenUrl = "/images/" + nombre;
             }
 
             _context.confiteria.Add(producto);
             _context.SaveChanges();
+            TempData["Mensaje"] = $"Producto \"{producto.Nombre}\" creado correctamente.";
             return RedirectToAction("Index");
         }
 
@@ -67,33 +72,35 @@ namespace CineBenavides.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Confiteria producto, IFormFile imagen)
+        public IActionResult Edit(Confiteria producto, IFormFile? imagen)
         {
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            if (imagen != null)
+            ModelState.Remove("ImagenFile");
+
+            if (!ModelState.IsValid)
+                return View(producto);
+
+            if (imagen != null && imagen.Length > 0)
             {
-                var ruta = Path.Combine(Directory.GetCurrentDirectory(),
-                    "wwwroot/images", imagen.FileName);
-
-                using (var stream = new FileStream(ruta, FileMode.Create))
-                {
-                    imagen.CopyTo(stream);
-                }
-
-                producto.ImagenUrl = "/images/" + imagen.FileName;
+                var carpeta = Path.Combine(_env.WebRootPath, "images");
+                Directory.CreateDirectory(carpeta);
+                var nombre = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+                using var stream = new FileStream(Path.Combine(carpeta, nombre), FileMode.Create);
+                imagen.CopyTo(stream);
+                producto.ImagenUrl = "/images/" + nombre;
             }
             else
             {
-                var original = _context.confiteria
-                    .AsNoTracking()
+                var original = _context.confiteria.AsNoTracking()
                     .FirstOrDefault(p => p.Id == producto.Id);
                 producto.ImagenUrl = original?.ImagenUrl;
             }
 
             _context.confiteria.Update(producto);
             _context.SaveChanges();
+            TempData["Mensaje"] = $"Producto \"{producto.Nombre}\" actualizado correctamente.";
             return RedirectToAction("Index");
         }
 
@@ -108,6 +115,7 @@ namespace CineBenavides.Controllers
             {
                 _context.confiteria.Remove(producto);
                 _context.SaveChanges();
+                TempData["Mensaje"] = $"Producto \"{producto.Nombre}\" eliminado.";
             }
 
             return RedirectToAction("Index");

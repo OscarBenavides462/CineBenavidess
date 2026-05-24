@@ -15,12 +15,17 @@ namespace CineBenavides.Controllers
             _context = context;
         }
 
+        private void CargarSelectLists(int? peliculaId = null, int? salaId = null)
+        {
+            ViewBag.Peliculas = new SelectList(_context.peliculas.OrderBy(p => p.Titulo).ToList(), "Id", "Titulo", peliculaId);
+            ViewBag.Salas = new SelectList(_context.salas.OrderBy(s => s.Nombre).ToList(), "Id", "Nombre", salaId);
+        }
+
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            // Traemos las funciones con su película y sala
             var funciones = _context.funciones
                 .Include(f => f.Pelicula)
                 .Include(f => f.Sala)
@@ -35,8 +40,18 @@ namespace CineBenavides.Controllers
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            ViewBag.Peliculas = new SelectList(_context.peliculas.ToList(), "Id", "Titulo");
-            ViewBag.Salas     = new SelectList(_context.salas.ToList(), "Id", "Nombre");
+            if (!_context.peliculas.Any())
+            {
+                TempData["Error"] = "Primero debes registrar al menos una película.";
+                return RedirectToAction("Index");
+            }
+            if (!_context.salas.Any())
+            {
+                TempData["Error"] = "Primero debes registrar al menos una sala.";
+                return RedirectToAction("Index");
+            }
+
+            CargarSelectLists();
             return View();
         }
 
@@ -46,16 +61,20 @@ namespace CineBenavides.Controllers
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            if (ModelState.IsValid)
+            ModelState.Remove("Pelicula");
+            ModelState.Remove("Sala");
+            ModelState.Remove("Reservas");
+
+            if (!ModelState.IsValid)
             {
-                _context.funciones.Add(funcion);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                CargarSelectLists(funcion.PeliculaId, funcion.SalaId);
+                return View(funcion);
             }
 
-            ViewBag.Peliculas = new SelectList(_context.peliculas.ToList(), "Id", "Titulo");
-            ViewBag.Salas     = new SelectList(_context.salas.ToList(), "Id", "Nombre");
-            return View(funcion);
+            _context.funciones.Add(funcion);
+            _context.SaveChanges();
+            TempData["Mensaje"] = "Función creada correctamente.";
+            return RedirectToAction("Index");
         }
 
         public IActionResult Edit(int id)
@@ -66,8 +85,7 @@ namespace CineBenavides.Controllers
             var funcion = _context.funciones.Find(id);
             if (funcion == null) return NotFound();
 
-            ViewBag.Peliculas = new SelectList(_context.peliculas.ToList(), "Id", "Titulo", funcion.PeliculaId);
-            ViewBag.Salas     = new SelectList(_context.salas.ToList(), "Id", "Nombre", funcion.SalaId);
+            CargarSelectLists(funcion.PeliculaId, funcion.SalaId);
             return View(funcion);
         }
 
@@ -77,16 +95,20 @@ namespace CineBenavides.Controllers
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
-            if (ModelState.IsValid)
+            ModelState.Remove("Pelicula");
+            ModelState.Remove("Sala");
+            ModelState.Remove("Reservas");
+
+            if (!ModelState.IsValid)
             {
-                _context.funciones.Update(funcion);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                CargarSelectLists(funcion.PeliculaId, funcion.SalaId);
+                return View(funcion);
             }
 
-            ViewBag.Peliculas = new SelectList(_context.peliculas.ToList(), "Id", "Titulo", funcion.PeliculaId);
-            ViewBag.Salas     = new SelectList(_context.salas.ToList(), "Id", "Nombre", funcion.SalaId);
-            return View(funcion);
+            _context.funciones.Update(funcion);
+            _context.SaveChanges();
+            TempData["Mensaje"] = "Función actualizada correctamente.";
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -98,8 +120,15 @@ namespace CineBenavides.Controllers
             var funcion = _context.funciones.Find(id);
             if (funcion != null)
             {
+                var reservas = _context.reservas.Include(r => r.Items).Where(r => r.FuncionId == id).ToList();
+                foreach (var reserva in reservas)
+                {
+                    _context.reservaItems.RemoveRange(reserva.Items);
+                    _context.reservas.Remove(reserva);
+                }
                 _context.funciones.Remove(funcion);
                 _context.SaveChanges();
+                TempData["Mensaje"] = "Función eliminada.";
             }
 
             return RedirectToAction("Index");
