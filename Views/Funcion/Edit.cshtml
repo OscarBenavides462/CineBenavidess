@@ -1,51 +1,57 @@
 @model CineBenavides.Models.Funcion
-@{ ViewData["Title"] = "Editar Función"; }
+@{ 
+    ViewData["Title"] = "Editar Función";
+    var minFecha = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+    // datetime-local necesita el formato yyyy-MM-ddTHH:mm exacto
+    var fechaFormato = Model.FechaHora.ToString("yyyy-MM-ddTHH:mm");
+}
 
-<h2>Editar Función</h2>
+<div class="container mt-4" style="max-width:600px">
+    <h2 class="mb-4">✏️ Editar Función</h2>
 
-<form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-    <input type="hidden" asp-for="Id" />
-
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-    <div class="mb-3">
-        <label>Película</label>
-        <select asp-for="PeliculaId" class="form-control" asp-items="ViewBag.Peliculas">
-            <option value="">-- Seleccione una película --</option>
-        </select>
-        <span asp-validation-for="PeliculaId" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label>Sala</label>
-        <select asp-for="SalaId" class="form-control" asp-items="ViewBag.Salas">
-            <option value="">-- Seleccione una sala --</option>
-        </select>
-        <span asp-validation-for="SalaId" class="text-danger"></span>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label>Fecha y Hora</label>
-            <input asp-for="FechaHora" class="form-control" type="datetime-local" />
-            <span asp-validation-for="FechaHora" class="text-danger"></span>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Película *</label>
+            <select asp-for="PeliculaId" class="form-select" asp-items="ViewBag.Peliculas">
+                <option value="">-- Seleccione una película --</option>
+            </select>
+            <span asp-validation-for="PeliculaId" class="text-danger small"></span>
         </div>
 
-        <div class="col-md-6 mb-3">
-            <label>Precio</label>
-            <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input asp-for="Precio" class="form-control" type="number" step="500" />
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Sala *</label>
+            <select asp-for="SalaId" class="form-select" asp-items="ViewBag.Salas">
+                <option value="">-- Seleccione una sala --</option>
+            </select>
+            <span asp-validation-for="SalaId" class="text-danger small"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 mb-3">
+                <label class="form-label fw-semibold">Fecha y Hora *</label>
+                <input name="FechaHora" class="form-control" type="datetime-local"
+                       value="@fechaFormato" min="@minFecha" />
+                <span asp-validation-for="FechaHora" class="text-danger small"></span>
             </div>
-            <span asp-validation-for="Precio" class="text-danger"></span>
+            <div class="col-md-5 mb-3">
+                <label class="form-label fw-semibold">Precio *</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Precio" class="form-control" type="number" step="500" min="0" />
+                </div>
+                <span asp-validation-for="Precio" class="text-danger small"></span>
+            </div>
         </div>
-    </div>
 
-    <button type="submit" class="btn btn-primary">Actualizar</button>
-    <a href="/Funcion/Index" class="btn btn-secondary">Volver</a>
-
-</form>
+        <div class="d-flex gap-2 mt-2">
+            <button type="submit" class="btn btn-primary px-4">💾 Actualizar</button>
+            <a href="/Funcion/Index" class="btn btn-secondary">Volver</a>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

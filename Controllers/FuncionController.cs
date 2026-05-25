@@ -17,8 +17,10 @@ namespace CineBenavides.Controllers
 
         private void CargarSelectLists(int? peliculaId = null, int? salaId = null)
         {
-            ViewBag.Peliculas = new SelectList(_context.peliculas.OrderBy(p => p.Titulo).ToList(), "Id", "Titulo", peliculaId);
-            ViewBag.Salas = new SelectList(_context.salas.OrderBy(s => s.Nombre).ToList(), "Id", "Nombre", salaId);
+            ViewBag.Peliculas = new SelectList(
+                _context.peliculas.OrderBy(p => p.Titulo).ToList(), "Id", "Titulo", peliculaId);
+            ViewBag.Salas = new SelectList(
+                _context.salas.OrderBy(s => s.Nombre).ToList(), "Id", "Nombre", salaId);
         }
 
         public IActionResult Index()
@@ -61,9 +63,16 @@ namespace CineBenavides.Controllers
             if (HttpContext.Session.GetString("Usuario") == null)
                 return RedirectToAction("Index", "Login");
 
+            // Propiedades de navegación que no vienen del form
             ModelState.Remove("Pelicula");
             ModelState.Remove("Sala");
             ModelState.Remove("Reservas");
+
+            // Validar fecha mínima (SQL Server no acepta DateTime.MinValue)
+            if (funcion.FechaHora == DateTime.MinValue || funcion.FechaHora.Year < 2000)
+            {
+                ModelState.AddModelError("FechaHora", "Debe ingresar una fecha y hora válida.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -99,6 +108,11 @@ namespace CineBenavides.Controllers
             ModelState.Remove("Sala");
             ModelState.Remove("Reservas");
 
+            if (funcion.FechaHora == DateTime.MinValue || funcion.FechaHora.Year < 2000)
+            {
+                ModelState.AddModelError("FechaHora", "Debe ingresar una fecha y hora válida.");
+            }
+
             if (!ModelState.IsValid)
             {
                 CargarSelectLists(funcion.PeliculaId, funcion.SalaId);
@@ -120,12 +134,17 @@ namespace CineBenavides.Controllers
             var funcion = _context.funciones.Find(id);
             if (funcion != null)
             {
-                var reservas = _context.reservas.Include(r => r.Items).Where(r => r.FuncionId == id).ToList();
+                var reservas = _context.reservas
+                    .Include(r => r.Items)
+                    .Where(r => r.FuncionId == id)
+                    .ToList();
+
                 foreach (var reserva in reservas)
                 {
                     _context.reservaItems.RemoveRange(reserva.Items);
                     _context.reservas.Remove(reserva);
                 }
+
                 _context.funciones.Remove(funcion);
                 _context.SaveChanges();
                 TempData["Mensaje"] = "Función eliminada.";
